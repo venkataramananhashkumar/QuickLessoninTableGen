@@ -1,0 +1,54 @@
+diff --git a/llvm/utils/TableGen/CMakeLists.txt b/llvm/utils/TableGen/CMakeLists.txt
+index 9e918852b1c0..d1ed0ccbe1a6 100644
+--- a/llvm/utils/TableGen/CMakeLists.txt
++++ b/llvm/utils/TableGen/CMakeLists.txt
+@@ -7,6 +7,7 @@ add_tablegen(llvm-tblgen LLVM
+   AsmWriterEmitter.cpp
+   AsmWriterInst.cpp
+   Attributes.cpp
++  BashAliasTableGen.cpp
+   CallingConvEmitter.cpp
+   CodeBeadsGen.cpp
+   CodeEmitterGen.cpp
+diff --git a/llvm/utils/TableGen/TableGen.cpp b/llvm/utils/TableGen/TableGen.cpp
+index 24c11c8bc831..91b11e81b385 100644
+--- a/llvm/utils/TableGen/TableGen.cpp
++++ b/llvm/utils/TableGen/TableGen.cpp
+@@ -31,6 +31,7 @@ enum ActionType {
+   GenInstrDocs,
+   GenAsmWriter,
+   GenAsmMatcher,
++  GenBashAliasPrinter,
+   GenDisassembler,
+   GenPseudoLowering,
+   GenCompressInst,
+@@ -92,6 +93,7 @@ cl::opt<ActionType> Action(
+         clEnumValN(GenCallingConv, "gen-callingconv",
+                    "Generate calling convention descriptions"),
+         clEnumValN(GenAsmWriter, "gen-asm-writer", "Generate assembly writer"),
++	clEnumValN(GenBashAliasPrinter, "gen-bash-alias-printer", "Generate Bash Aliases"),
+         clEnumValN(GenDisassembler, "gen-disassembler",
+                    "Generate disassembler"),
+         clEnumValN(GenPseudoLowering, "gen-pseudo-lowering",
+@@ -182,6 +184,9 @@ bool LLVMTableGenMain(raw_ostream &OS, RecordKeeper &Records) {
+   case GenAsmMatcher:
+     EmitAsmMatcher(Records, OS);
+     break;
++  case GenBashAliasPrinter:
++    EmitBashAliasPrinter(Records, OS);
++    break;
+   case GenDisassembler:
+     EmitDisassembler(Records, OS);
+     break;
+diff --git a/llvm/utils/TableGen/TableGenBackends.h b/llvm/utils/TableGen/TableGenBackends.h
+index 71db8dc77b05..151265751d12 100644
+--- a/llvm/utils/TableGen/TableGenBackends.h
++++ b/llvm/utils/TableGen/TableGenBackends.h
+@@ -65,6 +65,7 @@ void EmitIntrinsicEnums(RecordKeeper &RK, raw_ostream &OS);
+ void EmitIntrinsicImpl(RecordKeeper &RK, raw_ostream &OS);
+ void EmitAsmMatcher(RecordKeeper &RK, raw_ostream &OS);
+ void EmitAsmWriter(RecordKeeper &RK, raw_ostream &OS);
++void EmitBashAliasPrinter(RecordKeeper &RK, raw_ostream &OS);
+ void EmitCallingConv(RecordKeeper &RK, raw_ostream &OS);
+ void EmitCodeEmitter(RecordKeeper &RK, raw_ostream &OS);
+ void EmitCodeBeads(RecordKeeper &RK, raw_ostream &OS);
